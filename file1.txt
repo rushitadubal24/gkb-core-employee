@@ -1,0 +1,11 @@
+$result = $database->insert($fname, $lname, $gender, $email, $jdate, $deptname ,$hob, $folder);
+if($result)
+{
+      echo "success";
+      header('location:index.php');
+}
+else
+{
+      echo "error".mysqli_connect_error($result);
+}
+?>

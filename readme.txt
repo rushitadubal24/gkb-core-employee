@@ -1,0 +1,410 @@
+How To Run This Code :-
+
+1. Download Project and Extract Files
+2. Install XAMPP OR WAMP Web Server on Your System
+3. XAMPP - Move curdassignment Folder On " c:/xampp/htdocs/ " Or WAMP - Move Your Files On " c:/wamp/www/ "
+3. Open Your Web Browser And Type "localhost/phpmyadmin" Or "127.0.0.1/phpmyadmin"
+4. Then Click import Button & import Database (curddatabase.sql)
+5. Open Your Web Browser And Type "localhost/curdassignment/index.php" or "127.0.0.1/curdassignment/index.php"
+6. Here you see fully functional curd operation project. 
+
+Project Description:-
+
+- CRUD stands for Create, Read, Update, and Delete. CRUD operations are basic data manipulation for the database. 
+- First, I created a database in MYSQL.
+Create database crud;
+
+- Create a table in crud database.
+CREATE TABLE phpcurd(
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `FirstName` varchar(150) NOT NULL,
+  `LastName` varchar(150) NOT NULL,
+  `Gender` varchar(120) NOT NULL,
+  `Email` varchar(120) NOT NULL,
+  `Jdate` varchar(120) NOT NULL,
+  `DeptName` varchar(120) NOT NULL,
+  `Hobbies` varchar(120) NOT NULL,
+  `Image` varchar(120) NOT NULL,
+   PRIMARI KEY (`id`));
+
+- Create crud.php is the main file.  In this file, I will include data connection, add, view, edit, delete.
+* curd.php code :-
+<?php
+class Database
+{
+	private $connection;
+	public function connection_db()
+	{
+		$this->connection = mysqli_connect("localhost","root","","crud");
+		if(mysqli_connect_error())
+		{
+			echo "Error:", mysqli_connect_error();
+		}
+	}
+	public function data($var)
+	{
+      $return = mysqli_real_escape_string($this->connection, $var);
+      return $return;
+	}
+	if(isset($_POST['submit']))
+{
+     $fname = $database->data($_POST['fname']);
+     $lname = $database->data($_POST['lname']);
+     $gender =$_POST['gender'];
+     $email = $database->data($_POST['email']);
+     $jdate = $database->data($_POST['jdate']);
+     $deptname = $database->data($_POST['dept']);
+     $hob = $database->data($_POST['hobbies']);
+     //for image
+     $filename= $_FILES["image"]["name"];
+     $tempname=$_FILES['image']['tmp_name']; 
+     $folder = "images/".$filename;
+     move_uploaded_file($tempname, $folder);
+     $result = $database->insert($fname, $lname, $gender, $email, $jdate, $deptname,$hob, $folder);
+     if($result)
+    {
+        echo "success";
+        header('location:index.php');
+    }
+    else
+   {
+        echo "error".mysqli_connect_error($result);
+   }
+}
+public function insert($fname, $lname, $gender, $email, $jdate, $deptname, $image, $hob)
+{
+     $sql = "INSERT INTO phpcurd(FirstName, LastName, Gender, Email, Jdate, DeptName, Picture, Hobbies)
+             VALUES('$fname', '$lname', '$gender', '$email', '$jdate', '$deptname', '$image', '$hob')";
+     $result = mysqli_query($this->connection, $sql);
+     if($result)
+     {
+          return true;
+     }
+     else
+    {
+         return false;
+    }
+}
+public function read($id = null)
+{
+	$sql = "SELECT * FROM phpcurd";
+	if($id){ $sql .= " WHERE id=$id";}
+	$result = mysqli_query($this->connection,$sql);
+	return $result;
+}
+public function update($fname, $lname, $gender, $email, $jdate, $deptname, $image, $id, $hob)
+{
+        $sql = "UPDATE phpcurd set FirstName = '$fname', LastName='$lname', Gender='$gender', Email='$email', Jdate='$jdate', DeptName= '$deptname' ,Picture='$image', Hobbies='hob' where id = $id";
+        $result = mysqli_query($this->connection, $sql);
+        if($result)
+        {
+		return true;
+	}
+        else{
+		return false;
+	}
+}
+public function delete($id)
+{
+	$sql = "DELETE from phpcurd where id = $id";
+	$result = mysqli_query($this->connection, $sql);
+	 if($result)
+         {
+	 	return true;
+	 }
+         else
+         {
+	 	return false;
+	 }
+}
+}
+?>
+
+-Create insert.php file to add employee’s data in the database table. This contains 8 input fields of employees First name, Last name, Gender, Email, Joiningdate, department name, Hobbies and picture.
+* insert.php code:- 
+<html>
+<head>
+<body>
+<form method="POST" action="#" class="form-horizontal col-md-6 col-md-offset-3" enctype="multipart/form-data">
+    <fieldset>
+        <legend>
+            <center>
+                <h2><b> PHP CURD ADD OPERATION </b></h2>
+            </center>
+        </legend><br>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">FirstName:-</label>
+            <div class="col-sm-6">
+                <input type="text" name="fname" class="form-control" id="fname" placeholder="Enter your FirstName">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">LastName:-</label>
+            <div class="col-sm-6">
+                <input type="text" name="lname" class="form-control" id="lname" placeholder="Enter your LastName">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Gender:-</label>
+            <div class="col-sm-6">
+                <input type="radio" name="gender" id="gender" value="Male">Male
+                <input type="radio" name="gender" id="gender" value="Female">Female
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Email:-</label>
+            <div class="col-sm-6">
+                <input type="email" name="email" class="form-control" id="email" placeholder="Enter your Email-Address">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Joiningdate:-</label>
+            <div class="col-sm-6">
+                <input type="Date" name="jdate" class="form-control" id="jdate" placeholder="Enter your Joiningdate">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Department:-</label>
+            <div class="col-sm-6">
+                <select name="dept" class="form-control" id="dept">
+                    <option>HR</option>
+                    <option>admin</option>
+                    <option>Marketing</option>
+                    <option>Production</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Hobbies:-</label>
+            <div class="col-sm-6">
+                <input type="checkbox" id="hobbies" name="hobbies" value="TV">
+                <label> TV</label><br>
+                <input type="checkbox" id="hobbies" name="hobbies" value="Reading">
+                <label> Reading</label><br>
+                <input type="checkbox" id="hobbies" name="hobbies" value="Coding">
+                <label> Coding</label><br>
+                <input type="checkbox" id="hobbies" name="hobbies" value="Skiing">
+                <label> Skiing</label><br>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Image:-</label>
+            <div class="col-sm-6">
+                <input type="File" name="image" id="image">
+            </div>
+        </div>
+        <!-- Button -->
+        <div class="form-group">
+            <label class="col-md-3 control-label"></label>
+            <div class="col-md-2"><br>
+                <button type="submit" name="submit" class="btn btn-success">SUBMIT</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+</body>
+</html>
+
+- For view employee data create index.php file. 
+* index.php code:-
+<!DOCTYPE html>
+<html>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+<body>
+	<a href="insert.php">Add Record</a></p>
+    <div class="container">
+	<div class="row">
+		<table class="table "> 
+		<thead>
+			<tr> 
+				<th>No.</th> 
+				<th>FullName</th> 
+				<th>Gender</th> 
+				<th>E-Mail</th>
+				<th>Hobbies</th> 
+				<th>Joiningdate</th> 
+				<th>Department</th>
+				<th>Image</th>
+				<th>Action</th>
+			</tr>
+		</thead>  
+		</table>
+	</div>
+</div>
+</body>
+<html>
+<?php
+	include 'curd.php';
+	$no = 1;
+	while($res = mysqli_fetch_array($result)){
+?>
+	<tr> 
+		<td scope="row"><?php echo $no; ?></th> 
+		<td> <?php echo $res['FirstName']." ".$res['LastName']; ?></td> 
+		<td> <?php echo $res['Gender']; ?> </td> 
+		<td> <?php echo $res['Email']; ?> </td> 
+		<td> <?php echo $res['Jdate']; ?> </td>
+		<td> <?php echo $res['DeptName']?> </td>
+		<td> <?php echo $res['Hobbies']; ?> </td> 
+                <td> <img src="<?php echo $res['Picture']?>" width = "100" height="100"> </td>
+		<td>
+                       <a href="update.php?id=<?php echo $res['id'];?>"><span class="glyphicon glyphicon-edit" 
+                          aria-hidden="true"></span></a>
+                       <a href="delete.php?id=<?php echo $res['id'];?>"><span class="glyphicon glyphicon-remove" 
+                          aria-hidden="true"></span></a>
+                </td>
+        </tr> 
+	<?php
+		$no++;
+		}
+	?>	
+
+- For update employee data create update.php file. 
+* update.php code:-
+<?php
+include 'crud.php';
+$id = $_GET['id'];
+$result = $database->read($id);
+$res = mysqli_fetch_array($result);
+?>
+<html>
+<body>
+<form method="POST" action="#" class="form-horizontal col-md-6 col-md-offset-3" enctype="multipart/form-data">
+       <fieldset>
+               <legend><center><h2><b> PHP CURD DELETE OPERATION </b></h2></center></legend><br>
+               <div class="form-group">
+	              <label class="col-sm-3 control-label">FirstName:-</label>
+	              <div class="col-sm-6">
+                             <input type="text" name="fname" class="form-control" id="fname" placeholder="Enter your FirstName">	
+                      </div>
+	       </div>
+	       <div class="form-group">
+		      <label class="col-sm-3 control-label">LastName:-</label>
+		      <div class="col-sm-6">
+                             <input type="text" name="lname" class="form-control" id="lname" placeholder="Enter your LastName">
+		      </div>
+	       </div>
+	       <div class="form-group">
+		      <label class="col-sm-3 control-label">Gender:-</label>
+		      <div class="col-sm-6">
+                             <input type="radio" name="gender" id="gender" value="Male">Male
+                             <input type="radio" name="gender" id="gender" value="Female">Female
+		      </div>
+	       </div>
+               <div class="form-group">
+		      <label class="col-sm-3 control-label">Email:-</label>
+		      <div class="col-sm-6">
+                             <input type="email" name="email" class="form-control" id="email" placeholder="Enter your Email-Address">
+		      </div>
+	       </div>
+	       <div class="form-group">
+		      <label class="col-sm-3 control-label">Joiningdate:-</label>
+		      <div class="col-sm-6">
+                             <input type="Date" name="jdate" class="form-control" id="bdate" placeholder="Enter your Joiningdate">
+		      </div>
+	       </div>
+	       <div class="form-group">
+		      <label class="col-sm-3 control-label">Department:-</label>
+		      <div class="col-sm-6">
+		            <select name="dept" class="form-control" id="dept">
+				    <option>HR</option>
+				    <option>admin</option>
+				    <option>Marketing</option>
+				    <option>Production</option>
+			     </select>
+		     </div>
+		    <div class="form-group">
+		      <label class="col-sm-3 control-label">Hobbies:-</label>
+		      <div class="col-sm-6">
+		        <input type="checkbox" id="hobbies" name="hobbies" value="TV">
+                <label> TV</label><br>
+                <input type="checkbox" id="hobbies" name="hobbies" value="Reading">
+                <label> Reading</label><br>
+                <input type="checkbox" id="hobbies" name="hobbies" value="Coding">
+                <label> Coding</label><br>
+                <input type="checkbox" id="hobbies" name="hobbies" value="Skiing">
+                <label> Skiing</label><br>
+		     </div>
+	       </div>
+               <div class="form-group">
+		     <label class="col-sm-3 control-label">Image:-</label>
+		     <div class="col-sm-6">
+		            <input type="File" name="image" id="image">
+		     </div>
+	      </div>
+              <div class="form-group">
+                    <label class="col-md-3 control-label"></label>
+	            <div class="col-md-2"><br>
+                           <button type="submit" name="update " class="btn btn-success" >UPDATE </button>
+                    </div>
+	     </div>
+       </fieldset>
+</form>
+</body>
+</html>
+<?php
+if(isset($_POST['update'])){
+	$id = $_GET['id'];
+	$fname = $database->data($_POST['fname']);
+    $lname = $database->data($_POST['lname']);
+	$gender =$_POST['gender'];
+	$email = $database->data($_POST['email']);
+	$jdate = $database->data($_POST['jdate']);
+	echo $deptname = $database->data($_POST['dept']);
+	echo $hob = $database->data($_POST['hob']);
+	
+        $filename= $_FILES["image"]["name"];
+	$tempname=$_FILES['image']['tmp_name'];  
+	if($filename=="")
+        {
+		$folder = $_POST['hidden'];
+        }
+	else{
+		$folder = "images/".time().$filename;
+	}
+	move_uploaded_file($tempname, $folder);
+        $result = $database->update($fname, $lname, $gender, $email, $jdate,$deptname,$folder, $hob, $id);
+	if($result)
+        {
+		echo "update success";
+		header('location:index.php');
+	}
+        else{
+		echo "not update";
+	}
+}
+?>
+
+- For delete employee data create deletw.php file. 
+* delete.php code:-
+<?php
+	include 'crud.php';
+	echo $id = $_GET['id'];
+
+	$result = $database->delete($id);
+	if($result)
+        {
+		echo "delete success";
+		header('location:index.php');
+	}
+        else
+        {
+		echo "not delete";
+	}
+?>
